@@ -1,0 +1,59 @@
+<div class="bg-pharm-light min-h-screen pb-32">
+  <div class="max-w-3xl mx-auto px-4 pt-8">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-pharm-dark">Select a Concern</h1>
+      <p class="text-gray-500 text-sm mt-1">Please select the health concern for your consultation</p>
+    </div>
+
+    <!-- Concerns List -->
+    <div class="space-y-3">
+      <div *ngFor="let concern of concernsList" 
+           (click)="selectConcern(concern.name)"
+           [class.border-pharm-teal]="selectedConcern === concern.name"
+           [class.bg-teal-50/20]="selectedConcern === concern.name"
+           class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex items-center justify-between hover:border-pharm-teal/40 transition-colors cursor-pointer group">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg bg-pharm-light flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
+            {{concern.icon}}
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-pharm-dark group-hover:text-pharm-teal transition-colors">
+              {{concern.name}}
+            </h3>
+            <p class="text-xs text-gray-400 mt-0.5 line-clamp-1">
+              {{concern.desc}}
+            </p>
+          </div>
+        </div>
+
+        <!-- Custom Radio Button -->
+        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
+             [class.border-pharm-teal]="selectedConcern === concern.name"
+             [class.border-gray-300]="selectedConcern !== concern.name">
+          <div *ngIf="selectedConcern === concern.name" class="w-2.5 h-2.5 rounded-full bg-pharm-teal animate-scale-up"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Bottom Bar -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] py-4 px-6 z-40">
+    <div class="max-w-3xl mx-auto flex justify-between items-center gap-4">
+      <div class="hidden sm:block">
+        <p class="text-xs text-gray-400">Selected Concern:</p>
+        <p class="text-sm font-bold text-pharm-dark">
+          {{ selectedConcern || 'None selected' }}
+        </p>
+      </div>
+      <button (click)="proceedToDoctorSelection()"
+              [disabled]="!selectedConcern"
+              [class.bg-pharm-teal]="selectedConcern"
+              [class.hover:bg-pharm-teal-dark]="selectedConcern"
+              [class.bg-gray-300]="!selectedConcern"
+              [class.cursor-not-allowed]="!selectedConcern"
+              class="w-full sm:w-auto px-10 py-3 text-white font-bold text-sm rounded-lg shadow-md transition-all uppercase tracking-wider">
+        Proceed to doctor selection
+      </button>
+    </div>
+  </div>
+</div>

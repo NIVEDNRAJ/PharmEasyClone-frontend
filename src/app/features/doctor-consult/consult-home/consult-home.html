@@ -1,0 +1,152 @@
+<div class="bg-pharm-light min-h-screen pb-12">
+  <!-- 1. Hero Promo Banner -->
+  <div class="bg-gradient-to-r from-pharm-teal to-[#0d6b65] text-white py-12 px-6 shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
+      <div class="max-w-xl space-y-4">
+        <span class="bg-[#facc15] text-pharm-dark text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+          New Feature
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
+          Consult Certified Doctors <br/>Online 24/7 Access
+        </h1>
+        <p class="text-teal-50 text-sm md:text-base">
+          Connect with top-rated medical experts from the comfort of your home. Free follow-up for 3 days starting at just <span class="font-bold text-yellow-300">₹199</span>.
+        </p>
+        <div class="flex flex-wrap gap-4 pt-2">
+          <a routerLink="/doctor-consult/concern" class="bg-white hover:bg-teal-50 text-pharm-teal font-bold px-6 py-3 rounded-lg shadow-md transition-all inline-block">
+            Book Consultation
+          </a>
+          <a routerLink="/doctor-consult/history" class="bg-transparent hover:bg-white/10 border border-white font-bold px-6 py-3 rounded-lg transition-all inline-block">
+            My Bookings
+          </a>
+        </div>
+      </div>
+      <div class="hidden md:block w-80 h-80 relative flex items-center justify-center">
+        <!-- Visual Accent -->
+        <div class="absolute inset-0 bg-white/10 rounded-full blur-2xl"></div>
+        <span class="text-[140px] relative z-10 animate-bounce">🧑‍⚕️</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 space-y-12">
+    <!-- 2. Specialties Grid -->
+    <div>
+      <div class="flex justify-between items-end mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-pharm-dark">Popular Specialties</h2>
+          <p class="text-gray-500 text-sm">Select a specialty to browse available doctors</p>
+        </div>
+        <a routerLink="/doctor-consult/concern" class="text-pharm-teal font-bold hover:underline text-sm flex items-center gap-1">
+          View All Concerns
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+        <div *ngFor="let spec of specialties" 
+             (click)="selectSpecialty(spec.name)"
+             class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-pharm-teal/20 transition-all cursor-pointer text-center group flex flex-col justify-between h-40">
+          <span class="text-4xl group-hover:scale-110 transition-transform block mb-3">{{spec.icon}}</span>
+          <div>
+            <h3 class="text-sm font-bold text-pharm-dark leading-tight group-hover:text-pharm-teal transition-colors">
+              {{spec.name}}
+            </h3>
+            <p class="text-[11px] text-gray-400 mt-1 line-clamp-1">{{spec.desc}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Mid Banner Promotion -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-4">
+        <span class="text-4xl">⚖️</span>
+        <div>
+          <h3 class="text-lg font-bold text-pharm-dark">A second opinion can make all the difference</h3>
+          <p class="text-sm text-gray-500">Have your diagnosis reviewed by our panels of senior specialists.</p>
+        </div>
+      </div>
+      <a routerLink="/doctor-consult/concern" class="bg-pharm-teal text-white hover:bg-pharm-teal-dark font-bold px-6 py-2.5 rounded-lg transition-colors whitespace-nowrap">
+        Talk to an Expert
+      </a>
+    </div>
+
+    <!-- 4. Why Choose Us -->
+    <div>
+      <h2 class="text-2xl font-bold text-pharm-dark text-center mb-8">Why Consult Online via PharmEasy?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm text-center">
+          <div class="w-12 h-12 bg-teal-50 text-pharm-teal rounded-full flex items-center justify-center mx-auto text-xl font-bold mb-4">💬</div>
+          <h3 class="font-bold text-sm text-pharm-dark mb-1">Free Follow-Up</h3>
+          <p class="text-xs text-gray-400">Get free follow-up for 3 days after your consultation.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm text-center">
+          <div class="w-12 h-12 bg-teal-50 text-pharm-teal rounded-full flex items-center justify-center mx-auto text-xl font-bold mb-4">⏰</div>
+          <h3 class="font-bold text-sm text-pharm-dark mb-1">24/7 Availability</h3>
+          <p class="text-xs text-gray-400">Connect with an online general physician any time, day or night.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm text-center">
+          <div class="w-12 h-12 bg-teal-50 text-pharm-teal rounded-full flex items-center justify-center mx-auto text-xl font-bold mb-4">🩺</div>
+          <h3 class="font-bold text-sm text-pharm-dark mb-1">Specialist Network</h3>
+          <p class="text-xs text-gray-400">Consult expert cardiologists, dermatologists, gynaecologists, and more.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm text-center">
+          <div class="w-12 h-12 bg-teal-50 text-pharm-teal rounded-full flex items-center justify-center mx-auto text-xl font-bold mb-4">💳</div>
+          <h3 class="font-bold text-sm text-pharm-dark mb-1">Cost-Effective</h3>
+          <p class="text-xs text-gray-400">Premium care starting at rates lower than traditional clinic visits.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm text-center">
+          <div class="w-12 h-12 bg-teal-50 text-pharm-teal rounded-full flex items-center justify-center mx-auto text-xl font-bold mb-4">🔒</div>
+          <h3 class="font-bold text-sm text-pharm-dark mb-1">100% Confidential</h3>
+          <p class="text-xs text-gray-400">Your health data is safe with our advanced security encryptions.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. How to Book a Consultation -->
+    <div class="bg-teal-50/50 rounded-2xl p-8 border border-pharm-teal/10">
+      <h2 class="text-2xl font-bold text-pharm-dark text-center mb-8">How to Book a Consultation?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+        <div class="space-y-3 relative z-10 text-center md:text-left">
+          <div class="w-10 h-10 bg-pharm-teal text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto md:mx-0 shadow-md">1</div>
+          <h3 class="font-bold text-sm text-pharm-dark">Select Health Concern</h3>
+          <p class="text-xs text-gray-500">Pick from our 17 specialties and health concerns that fit your symptoms.</p>
+        </div>
+        <div class="space-y-3 relative z-10 text-center md:text-left">
+          <div class="w-10 h-10 bg-pharm-teal text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto md:mx-0 shadow-md">2</div>
+          <h3 class="font-bold text-sm text-pharm-dark">Choose the Doctor</h3>
+          <p class="text-xs text-gray-500">Select a preferred doctor based on experience, language, or fees.</p>
+        </div>
+        <div class="space-y-3 relative z-10 text-center md:text-left">
+          <div class="w-10 h-10 bg-pharm-teal text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto md:mx-0 shadow-md">3</div>
+          <h3 class="font-bold text-sm text-pharm-dark">Enter Patient Details</h3>
+          <p class="text-xs text-gray-500">Add patient name, gender, and write down optional symptoms.</p>
+        </div>
+        <div class="space-y-3 relative z-10 text-center md:text-left">
+          <div class="w-10 h-10 bg-pharm-teal text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto md:mx-0 shadow-md">4</div>
+          <h3 class="font-bold text-sm text-pharm-dark">Confirm Preferred Slot</h3>
+          <p class="text-xs text-gray-500">Pick date/time slot, apply coupons, and checkout securely.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. FAQ Accordion -->
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-2xl font-bold text-pharm-dark text-center mb-6">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        <div *ngFor="let faq of faqs; let i = index" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden transition-all">
+          <button (click)="toggleFaq(i)" class="w-full text-left px-6 py-4 font-bold text-sm text-pharm-dark flex justify-between items-center hover:bg-gray-50 transition-colors">
+            <span>{{faq.q}}</span>
+            <span class="text-pharm-teal text-lg font-bold">
+              {{ faqOpenIndex === i ? '−' : '+' }}
+            </span>
+          </button>
+          <div *ngIf="faqOpenIndex === i" class="px-6 pb-5 pt-1 text-xs text-gray-500 border-t border-gray-50 leading-relaxed animate-fade-in">
+            {{faq.a}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

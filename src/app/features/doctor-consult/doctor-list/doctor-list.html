@@ -1,0 +1,86 @@
+<div class="bg-pharm-light min-h-screen pb-12">
+  <div class="max-w-4xl mx-auto px-4 pt-8">
+    <!-- Back Navigation & Title -->
+    <div class="flex items-center gap-2 mb-6">
+      <a routerLink="/doctor-consult/concern" class="p-2 hover:bg-white rounded-lg transition-colors text-pharm-teal">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-pharm-dark">
+          {{ specialty ? specialty : 'All Certified Specialists' }}
+        </h1>
+        <p class="text-gray-500 text-xs mt-0.5">
+          {{ doctors.length }} verified specialists available
+        </p>
+      </div>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <div *ngIf="isLoading" class="space-y-4">
+      <div *ngFor="let item of [1,2,3]" class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm animate-pulse space-y-4">
+        <div class="flex gap-4">
+          <div class="w-20 h-20 bg-gray-200 rounded-lg"></div>
+          <div class="flex-1 space-y-2 py-1">
+            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/3"></div>
+          </div>
+        </div>
+        <div class="h-10 bg-gray-200 rounded-lg"></div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && doctors.length === 0" class="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm max-w-md mx-auto mt-12 space-y-4">
+      <span class="text-5xl block">🧑‍⚕️</span>
+      <h3 class="text-base font-bold text-pharm-dark">No specialists found</h3>
+      <p class="text-xs text-gray-400">We currently don't have active doctors for this specific specialty online. Try checking our general health physicians.</p>
+      <a routerLink="/doctor-consult/concern" class="inline-block bg-pharm-teal hover:bg-pharm-teal-dark text-white font-bold text-xs px-6 py-2.5 rounded-lg transition-colors uppercase">
+        Select another concern
+      </a>
+    </div>
+
+    <!-- Doctor List -->
+    <div *ngIf="!isLoading && doctors.length > 0" class="space-y-4">
+      <div *ngFor="let doctor of doctors" 
+           class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center justify-between gap-6">
+        
+        <div class="flex gap-4 items-start">
+          <img [src]="doctor.imageUrl || 'https://via.placeholder.com/150'" 
+               [alt]="doctor.name" 
+               class="w-20 h-20 rounded-xl object-cover bg-pharm-light border border-gray-100 flex-shrink-0">
+          
+          <div class="space-y-1">
+            <h2 class="text-base font-extrabold text-pharm-dark flex items-center gap-2">
+              {{ doctor.name }}
+              <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            </h2>
+            <p class="text-xs text-pharm-teal font-bold uppercase tracking-wider">
+              {{ doctor.specialty }}
+            </p>
+            <p class="text-xs text-gray-500 font-medium">
+              {{ doctor.qualifications }}
+            </p>
+            <div class="flex items-center gap-2 pt-1 text-[11px] text-gray-400">
+              <span class="flex items-center gap-0.5">💬 Speaks: {{ doctor.languages }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side / Price & CTA -->
+        <div class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-4 pt-4 md:pt-0 border-t md:border-t-0 border-gray-50">
+          <div class="text-left md:text-right">
+            <span class="text-[10px] text-gray-400 block uppercase font-bold tracking-wider">Consultation Fee</span>
+            <span class="text-xl font-black text-pharm-dark">₹{{ doctor.consultationFee }}</span>
+          </div>
+          
+          <button (click)="selectDoctor(doctor.id)" 
+                  class="bg-pharm-teal hover:bg-pharm-teal-dark text-white font-bold text-xs px-6 py-3 rounded-lg shadow-md transition-colors uppercase tracking-wider whitespace-nowrap">
+            Book Appointment
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,28 +1,26 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-auth-drawer',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './auth-drawer.html'
 })
 export class AuthDrawerComponent {
   authService = inject(AuthService);
   private fb = inject(FormBuilder);
 
-  // UI State: 'email' | 'otp' | 'loading'
-  step: 'email' | 'otp' | 'loading' = 'email';
+  // UI State: 'email' | 'loading'
+  step: 'email' | 'loading' = 'email';
   errorMessage = '';
+
+  selectedRole = 'Customer'; // Customer, Vendor, Doctor, Admin
 
   emailForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]]
-  });
-
-  otpForm: FormGroup = this.fb.group({
-    code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
   });
 
   close() {
@@ -31,46 +29,26 @@ export class AuthDrawerComponent {
     setTimeout(() => {
       this.step = 'email';
       this.emailForm.reset();
-      this.otpForm.reset();
       this.errorMessage = '';
     }, 300); // Wait for sliding animation to finish
   }
 
-  requestOtp() {
+  login() {
     if (this.emailForm.invalid) return;
     
     this.step = 'loading';
     this.errorMessage = '';
     const email = this.emailForm.value.email;
 
-    this.authService.sendOtp(email).subscribe({
-      next: () => {
-        this.step = 'otp';
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to send OTP. Please try again.';
-        this.step = 'email';
-      }
-    });
-  }
-
-  verifyOtp() {
-    if (this.otpForm.invalid) return;
-
-    this.step = 'loading';
-    this.errorMessage = '';
-    const email = this.emailForm.value.email;
-    const code = this.otpForm.value.code;
-
-    this.authService.verifyOtp(email, code).subscribe({
+    this.authService.login(email, this.selectedRole).subscribe({
       next: (res) => {
-        this.authService.saveToken(res.token);
+        this.authService.saveToken(res.token, res.role);
         this.close();
-        alert('Login Successful!'); // We will replace this with a nice toast later
+        window.location.href = this.authService.getDashboardRoute() || '/';
       },
       error: (err) => {
-        this.errorMessage = 'Invalid or expired OTP.';
-        this.step = 'otp';
+        this.errorMessage = 'Authentication failed. Please check your network or try again.';
+        this.step = 'email';
       }
     });
   }

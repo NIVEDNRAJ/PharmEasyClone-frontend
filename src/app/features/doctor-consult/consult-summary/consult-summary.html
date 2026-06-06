@@ -1,0 +1,291 @@
+<div class="bg-pharm-light min-h-screen pb-32">
+  <div class="max-w-5xl mx-auto px-4 pt-8">
+    <div class="flex items-center gap-2 mb-6">
+      <a [routerLink]="['/doctor-consult/doctors']" [queryParams]="{specialty: doctor?.specialty}" class="p-2 hover:bg-white rounded-lg transition-colors text-pharm-teal">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-pharm-dark">Consultation Summary</h1>
+        <p class="text-gray-500 text-xs mt-0.5">Complete your details to book the consultation</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="text-center py-12">
+      <div class="w-12 h-12 border-4 border-pharm-teal border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-gray-500 text-sm">Fetching appointment details...</p>
+    </div>
+
+    <!-- Main Layout Grid -->
+    <div *ngIf="!isLoading && doctor" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Left Column: Form & Selection -->
+      <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Doctor Info Header Card -->
+        <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm flex items-start gap-4">
+          <img [src]="doctor.imageUrl || 'https://via.placeholder.com/150'" 
+               [alt]="doctor.name" 
+               class="w-16 h-16 rounded-xl object-cover border border-gray-100">
+          <div>
+            <h2 class="text-base font-extrabold text-pharm-dark">{{ doctor.name }}</h2>
+            <p class="text-xs text-pharm-teal font-bold uppercase tracking-wider">{{ doctor.specialty }}</p>
+            <p class="text-xs text-gray-500 font-medium">{{ doctor.qualifications }}</p>
+            <p class="text-[11px] text-gray-400 mt-1">🗣️ Speaks: {{ doctor.languages }}</p>
+          </div>
+        </div>
+
+        <!-- Date Slots Calendar Grid -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-pharm-dark">Select your preferred slot</h3>
+          
+          <!-- Calendar dates strip -->
+          <div class="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
+            <div *ngFor="let dt of dates; let idx = index" 
+                 (click)="selectDate(idx)"
+                 [class.border-pharm-teal]="selectedDateIndex === idx"
+                 [class.bg-pharm-teal]="selectedDateIndex === idx"
+                 [class.text-white]="selectedDateIndex === idx"
+                 [class.border-gray-200]="selectedDateIndex !== idx"
+                 [class.bg-white]="selectedDateIndex !== idx"
+                 [class.text-gray-600]="selectedDateIndex !== idx"
+                 class="min-w-[70px] py-3 border rounded-xl text-center cursor-pointer transition-all flex flex-col justify-between shrink-0">
+              <span class="text-[10px] uppercase font-bold tracking-wider opacity-80">{{ dt.dayName }}</span>
+              <span class="text-lg font-black leading-tight">{{ dt.dateNum }}</span>
+              <span class="text-[9px] font-medium opacity-80">{{ dt.month }}</span>
+            </div>
+          </div>
+
+          <!-- Time Slots list -->
+          <div class="space-y-4 pt-2">
+            <!-- Afternoon Slots -->
+            <div>
+              <button (click)="isAfternoonOpen = !isAfternoonOpen" class="w-full flex justify-between items-center text-xs font-bold text-gray-500 uppercase py-2 border-b border-gray-50">
+                <span>☀️ Afternoon</span>
+                <span>{{ isAfternoonOpen ? '▲' : '▼' }}</span>
+              </button>
+              <div *ngIf="isAfternoonOpen" class="flex flex-wrap gap-2.5 pt-3">
+                <button *ngFor="let slot of afternoonSlots" 
+                        (click)="selectSlot(slot)"
+                        [class.bg-pharm-teal]="selectedSlot === slot"
+                        [class.text-white]="selectedSlot === slot"
+                        [class.border-pharm-teal]="selectedSlot === slot"
+                        [class.border-gray-200]="selectedSlot !== slot"
+                        [class.bg-white]="selectedSlot !== slot"
+                        [class.text-pharm-teal]="selectedSlot !== slot"
+                        class="px-5 py-2.5 border rounded-lg text-xs font-bold transition-all shadow-sm hover:shadow">
+                  {{ slot }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Evening Slots -->
+            <div>
+              <button (click)="isEveningOpen = !isEveningOpen" class="w-full flex justify-between items-center text-xs font-bold text-gray-500 uppercase py-2 border-b border-gray-50">
+                <span>🌙 Evening</span>
+                <span>{{ isEveningOpen ? '▲' : '▼' }}</span>
+              </button>
+              <div *ngIf="isEveningOpen" class="flex flex-wrap gap-2.5 pt-3">
+                <button *ngFor="let slot of eveningSlots" 
+                        (click)="selectSlot(slot)"
+                        [class.bg-pharm-teal]="selectedSlot === slot"
+                        [class.text-white]="selectedSlot === slot"
+                        [class.border-pharm-teal]="selectedSlot === slot"
+                        [class.border-gray-200]="selectedSlot !== slot"
+                        [class.bg-white]="selectedSlot !== slot"
+                        [class.text-gray-700]="selectedSlot !== slot"
+                        class="px-5 py-2.5 border rounded-lg text-xs font-bold transition-all shadow-sm hover:shadow">
+                  {{ slot }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patient Details Form -->
+        <div [formGroup]="bookingForm" class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm space-y-6">
+          <h3 class="text-sm font-bold text-pharm-dark border-b border-gray-50 pb-2">Patient Details</h3>
+          
+          <div class="space-y-4">
+            <!-- Patient Name -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-500 block">Patient Name</label>
+              <input formControlName="patientName" 
+                     placeholder="Enter full name" 
+                     class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-pharm-teal text-sm text-pharm-dark placeholder-gray-400">
+              <p *ngIf="bookingForm.get('patientName')?.touched && bookingForm.get('patientName')?.invalid" class="text-red-500 text-[11px] font-bold">
+                Patient name is required (minimum 2 characters).
+              </p>
+            </div>
+
+            <!-- Gender Select -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-500 block">Gender</label>
+              <div class="flex gap-3">
+                <button type="button" *ngFor="let gen of ['Male', 'Female', 'Other']"
+                        (click)="bookingForm.patchValue({gender: gen})"
+                        [class.bg-teal-50]="bookingForm.value.gender === gen"
+                        [class.text-pharm-teal]="bookingForm.value.gender === gen"
+                        [class.border-pharm-teal]="bookingForm.value.gender === gen"
+                        [class.border-gray-200]="bookingForm.value.gender !== gen"
+                        [class.text-gray-500]="bookingForm.value.gender !== gen"
+                        class="flex-1 py-2.5 border rounded-lg text-xs font-bold transition-colors text-center">
+                  {{ gen }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Symptoms Description -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-500 block">Describe Symptoms (Optional)</label>
+              <textarea formControlName="symptoms" 
+                        placeholder="eg: Pain in joints, saans lene mein takleef, etc." 
+                        rows="3"
+                        class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-pharm-teal text-sm text-pharm-dark placeholder-gray-400 resize-none"></textarea>
+            </div>
+
+            <!-- Mode of Consultation -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-500 block">Choose Consultation Mode</label>
+              <div class="flex gap-4">
+                <label class="flex-1 flex items-center justify-between p-4 border rounded-xl cursor-pointer hover:border-pharm-teal/40 transition-colors"
+                       [class.border-pharm-teal]="bookingForm.value.mode === 'Audio'"
+                       [class.bg-teal-50/10]="bookingForm.value.mode === 'Audio'">
+                  <span class="text-xs font-bold text-pharm-dark flex items-center gap-2">📞 Audio Call</span>
+                  <input type="radio" formControlName="mode" value="Audio" class="accent-pharm-teal">
+                </label>
+                <label class="flex-1 flex items-center justify-between p-4 border rounded-xl cursor-pointer hover:border-pharm-teal/40 transition-colors"
+                       [class.border-pharm-teal]="bookingForm.value.mode === 'Video'"
+                       [class.bg-teal-50/10]="bookingForm.value.mode === 'Video'">
+                  <span class="text-xs font-bold text-pharm-dark flex items-center gap-2">📹 Video Call</span>
+                  <input type="radio" formControlName="mode" value="Video" class="accent-pharm-teal">
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Coupons & Bill Summary -->
+      <div class="space-y-6">
+        
+        <!-- Coupons Section -->
+        <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-pharm-dark flex items-center gap-1.5">
+            🏷️ Coupons
+          </h3>
+          
+          <div *ngIf="!appliedCoupon" class="flex gap-2">
+            <input [(ngModel)]="couponCode" 
+                   placeholder="Enter Coupon Code" 
+                   class="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg text-xs font-medium focus:outline-none focus:border-pharm-teal text-pharm-dark placeholder-gray-400 uppercase">
+            <button (click)="applyCoupon()" 
+                    class="bg-pharm-teal text-white hover:bg-pharm-teal-dark font-bold text-xs px-5 py-2.5 rounded-lg transition-colors uppercase">
+              Apply
+            </button>
+          </div>
+
+          <div *ngIf="appliedCoupon" class="bg-green-50 p-3 rounded-lg border border-green-200 flex justify-between items-center">
+            <div>
+              <span class="text-xs font-bold text-green-700 block">{{ appliedCoupon.code }} Applied</span>
+              <span class="text-[10px] text-green-600 block">Saved ₹{{ appliedCoupon.discountAmount }} on consultation</span>
+            </div>
+            <button (click)="removeCoupon()" class="text-red-500 font-bold text-xs hover:underline uppercase">
+              Remove
+            </button>
+          </div>
+
+          <p *ngIf="couponError" class="text-red-500 text-[11px] font-bold">{{ couponError }}</p>
+          <p *ngIf="couponSuccess" class="text-green-600 text-[11px] font-bold">{{ couponSuccess }}</p>
+
+          <div *ngIf="!appliedCoupon" class="bg-pharm-light p-3 rounded-lg text-[11px] text-gray-500 leading-normal">
+            💡 Tip: Use coupon <span class="font-extrabold text-pharm-teal">DOCTOR150</span> to get a flat discount of ₹150.00!
+          </div>
+        </div>
+
+        <!-- Bill Summary Card -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-pharm-dark border-b border-gray-50 pb-2">Bill Summary</h3>
+          
+          <div class="space-y-3.5 text-xs text-gray-500">
+            <div class="flex justify-between">
+              <span>Doctor Fee (MRP)</span>
+              <span class="font-bold text-pharm-dark">₹{{ mrp | number:'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between" *ngIf="discount > 0">
+              <span>Coupon Discount</span>
+              <span class="font-bold text-green-600">- ₹{{ discount | number:'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between pt-3 border-t border-dashed border-gray-100">
+              <span class="text-sm font-bold text-pharm-dark">Amount to be paid</span>
+              <span class="text-lg font-black text-pharm-teal">₹{{ totalAmount | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm CTA Action -->
+        <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm space-y-3">
+          <button (click)="onSubmit()"
+                  [disabled]="isSubmitting"
+                  class="w-full bg-[#facc15] hover:bg-[#eab308] text-pharm-dark font-black text-sm py-4 rounded-lg shadow-md hover:shadow-lg transition-all uppercase tracking-wider">
+            {{ isSubmitting ? 'Processing order...' : 'Pay ₹' + (totalAmount | number:'1.0-0') + '.00 & Confirm Booking' }}
+          </button>
+          
+          <p class="text-[10px] text-gray-400 text-center leading-relaxed">
+            By proceeding, you agree to receive the consultation through PharmEasy's partner, MeraDoc. You consent to share your information with MeraDoc and agree to its <span class="text-pharm-teal hover:underline cursor-pointer">Privacy Policy</span>.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Premium Simulated Payment Gateway Overlay Modal -->
+<div *ngIf="showSimulatedPayment" class="fixed inset-0 bg-pharm-dark/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 space-y-6 text-center">
+    
+    <div class="space-y-2">
+      <div class="w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto text-3xl">💳</div>
+      <h2 class="text-lg font-black text-pharm-dark">Simulated Payment Gateway</h2>
+      <p class="text-xs text-gray-400">
+        You are using test mode. Proceed with checkout confirmation for this booking.
+      </p>
+    </div>
+
+    <!-- Booking Info Row -->
+    <div class="bg-pharm-light p-4 rounded-xl text-left text-xs space-y-2">
+      <div class="flex justify-between">
+        <span class="text-gray-400">Doctor Name:</span>
+        <span class="font-bold text-pharm-dark">{{ doctor?.name }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-400">Patient Name:</span>
+        <span class="font-bold text-pharm-dark">{{ bookingForm.value.patientName }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-400">Date & Slot:</span>
+        <span class="font-bold text-pharm-dark">{{ dates[selectedDateIndex].label }} at {{ selectedSlot }}</span>
+      </div>
+      <div class="flex justify-between pt-2 border-t border-dashed border-gray-200 text-sm">
+        <span class="font-bold text-pharm-dark">Total Paid Amount:</span>
+        <span class="font-black text-pharm-teal">₹{{ totalAmount | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex gap-3 pt-2">
+      <button (click)="cancelSimulatedPayment()" 
+              class="flex-1 py-3 border border-gray-200 hover:bg-gray-50 text-gray-500 font-bold text-xs rounded-lg transition-colors uppercase">
+        Cancel
+      </button>
+      <button (click)="confirmSimulatedSuccess()" 
+              class="flex-1 py-3 bg-pharm-teal hover:bg-pharm-teal-dark text-white font-bold text-xs rounded-lg shadow-md transition-colors uppercase">
+        Confirm Payment
+      </button>
+    </div>
+
+  </div>
+</div>

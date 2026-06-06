@@ -1,0 +1,123 @@
+<div class="bg-pharm-light min-h-screen pb-16">
+  <div class="max-w-5xl mx-auto px-4 pt-8">
+    
+    <!-- Breadcrumbs & Navigation -->
+    <div class="flex items-center gap-2 mb-6 text-xs text-gray-400">
+      <a routerLink="/" class="hover:text-pharm-teal">Home</a>
+      <span>/</span>
+      <a routerLink="/search" [queryParams]="{category: product?.category}" class="hover:text-pharm-teal">{{ product?.category }}</a>
+      <span>/</span>
+      <span class="text-gray-600 font-bold truncate max-w-xs">{{ product?.name }}</span>
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="text-center py-12 bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="w-12 h-12 border-4 border-pharm-teal border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-gray-500 text-sm">Loading product details...</p>
+    </div>
+
+    <!-- Product Detail Layout -->
+    <div *ngIf="!isLoading && product" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Left Column: Product Image Frame -->
+      <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex items-center justify-center h-[380px]">
+        <img [src]="product.imageUrl || 'https://via.placeholder.com/250'" 
+             [alt]="product.name" 
+             class="max-h-full object-contain mix-blend-multiply">
+      </div>
+
+      <!-- Right Column: Details & Checkout Action -->
+      <div class="space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-4">
+          <div class="space-y-1">
+            <span class="text-xs text-pharm-teal font-extrabold bg-teal-50 px-2.5 py-0.5 rounded-full uppercase">
+              {{ product.category }}
+            </span>
+            <h1 class="text-xl md:text-2xl font-black text-pharm-dark leading-tight">
+              {{ product.name }}
+            </h1>
+          </div>
+
+          <!-- Prescription Required Notice -->
+          <div *ngIf="product.requiresPrescription" class="bg-blue-50/50 border border-blue-200/50 p-3.5 rounded-xl flex items-start gap-3">
+            <span class="text-xl">📋</span>
+            <div>
+              <span class="text-xs font-bold text-blue-700 block">Prescription Required</span>
+              <p class="text-[11px] text-gray-500 mt-0.5">You must present a valid medical prescription from a registered practitioner to verify this order at checkout.</p>
+            </div>
+          </div>
+
+          <!-- Pricing Block -->
+          <div class="border-t border-b border-gray-50 py-4 flex items-center justify-between">
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-2 text-xs text-gray-400">
+                <span>MRP</span>
+                <span class="line-through">₹{{ (product.bestPrice / (1 - (product.maxDiscount/100))) | number:'1.2-2' }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-2xl font-black text-pharm-dark">₹{{ product.bestPrice | number:'1.2-2' }}</span>
+                <span *ngIf="product.maxDiscount > 0" class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded">
+                  {{ product.maxDiscount }}% OFF
+                </span>
+              </div>
+              <p class="text-[10px] text-gray-400">Inclusive of all taxes</p>
+            </div>
+
+            <!-- Cart Addition controls -->
+            <div>
+              <!-- Add Button -->
+              <button *ngIf="!cartItem" 
+                      (click)="addToCart()"
+                      class="bg-pharm-teal hover:bg-pharm-teal-dark text-white font-black text-sm px-8 py-3 rounded-lg shadow-md hover:shadow-lg transition-all uppercase tracking-wider">
+                Add To Cart
+              </button>
+
+              <!-- Quantity Counter Adjuster -->
+              <div *ngIf="cartItem" class="flex items-center border border-pharm-teal rounded-lg overflow-hidden bg-white shadow">
+                <button (click)="decrementQuantity()" 
+                        class="px-4 py-2 text-pharm-teal hover:bg-pharm-light font-black text-base transition-colors">
+                  −
+                </button>
+                <span class="px-4 text-sm font-bold text-pharm-dark min-w-[35px] text-center">
+                  {{ cartItem.quantity }}
+                </span>
+                <button (click)="incrementQuantity()" 
+                        class="px-4 py-2 text-pharm-teal hover:bg-pharm-light font-black text-base transition-colors">
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sellers/Vendor Inventory Listings -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Available Sellers</h3>
+            <div class="space-y-2">
+              <div *ngFor="let inv of product.inventories" class="bg-pharm-light/20 p-3 rounded-xl border border-gray-100 flex justify-between items-center text-xs">
+                <div>
+                  <span class="font-bold text-pharm-dark block">{{ inv.vendorName }}</span>
+                  <span class="text-[10px] text-gray-400 block" [class.text-red-500]="inv.stockCount < 10">
+                    Stock Left: {{ inv.stockCount }} units
+                  </span>
+                </div>
+                <div class="text-right">
+                  <span class="font-black text-pharm-dark block">₹{{ inv.price | number:'1.2-2' }}</span>
+                  <span *ngIf="inv.discountPercentage > 0" class="text-[10px] text-green-600 font-bold block">{{ inv.discountPercentage }}% OFF</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Description Card -->
+    <div *ngIf="!isLoading && product" class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mt-8 space-y-4">
+      <h2 class="text-base font-bold text-pharm-dark border-b border-gray-50 pb-2">Product Description</h2>
+      <p class="text-xs text-gray-500 leading-relaxed font-medium">
+        {{ product.description }}
+      </p>
+    </div>
+
+  </div>
+</div>
