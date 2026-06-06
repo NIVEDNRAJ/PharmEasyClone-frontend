@@ -1,0 +1,61 @@
+<div *ngIf="authService.isDrawerOpen$ | async" 
+     class="fixed inset-0 bg-black/50 z-[100] transition-opacity duration-300"
+     (click)="close()">
+</div>
+
+<div class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[110] transform transition-transform duration-300 shadow-2xl flex flex-col"
+     [ngClass]="(authService.isDrawerOpen$ | async) ? 'translate-x-0' : 'translate-x-full'">
+  
+  <div class="bg-pharm-teal px-6 py-8 relative text-white flex justify-between items-start">
+    <div>
+      <h2 class="text-2xl font-bold mb-2">Login/Sign up to <br> continue</h2>
+    </div>
+    <button (click)="close()" class="p-1 hover:bg-white/20 rounded-full transition-colors">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+  </div>
+
+  <div class="p-6 flex-1 flex flex-col">
+    
+    <div *ngIf="errorMessage" class="bg-red-50 text-red-600 p-3 rounded-md text-sm mb-4 border border-red-100">
+      {{ errorMessage }}
+    </div>
+
+    <form *ngIf="step === 'email'" [formGroup]="emailForm" (ngSubmit)="requestOtp()" class="flex-1">
+      <label class="block text-sm font-bold text-gray-700 mb-2">Enter your Email ID</label>
+      <input type="email" formControlName="email" placeholder="example@domain.com"
+             class="w-full px-4 py-3 rounded-md border border-gray-300 focus:border-pharm-teal focus:ring-1 focus:ring-pharm-teal outline-none transition-all mb-6">
+      
+      <button type="submit" [disabled]="emailForm.invalid"
+              class="w-full bg-pharm-teal hover:bg-pharm-teal-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-md transition-colors">
+        Send OTP via Email
+      </button>
+    </form>
+
+    <form *ngIf="step === 'otp'" [formGroup]="otpForm" (ngSubmit)="verifyOtp()" class="flex-1">
+      <div class="flex items-center gap-2 mb-6 text-sm text-gray-600">
+        <button type="button" (click)="step = 'email'" class="hover:text-pharm-teal">
+          <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </button>
+        <span>Enter OTP sent to <strong class="text-pharm-dark">{{ emailForm.value.email }}</strong></span>
+      </div>
+      
+      <input type="text" formControlName="code" placeholder="Enter 6-digit code" maxlength="6"
+             class="w-full px-4 py-3 rounded-md border border-gray-300 focus:border-pharm-teal focus:ring-1 focus:ring-pharm-teal outline-none text-center tracking-widest text-lg font-bold mb-6">
+      
+      <button type="submit" [disabled]="otpForm.invalid"
+              class="w-full bg-pharm-teal hover:bg-pharm-teal-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-md transition-colors">
+        Verify & Login
+      </button>
+    </form>
+
+    <div *ngIf="step === 'loading'" class="flex-1 flex flex-col items-center justify-center">
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-pharm-teal mb-4"></div>
+      <p class="text-gray-500 text-sm font-medium">Please wait...</p>
+    </div>
+
+    <p class="text-[11px] text-gray-500 mt-auto text-center pt-6">
+      By continuing, you agree with our <span class="text-pharm-teal cursor-pointer hover:underline">Privacy Policy</span> and <span class="text-pharm-teal cursor-pointer hover:underline">Terms and Conditions</span>
+    </p>
+  </div>
+</div>
