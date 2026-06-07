@@ -21,8 +21,29 @@
       {{ errorMessage }}
     </div>
 
+    <div *ngIf="successMessage" class="bg-green-50 text-green-700 p-3 rounded-md text-sm mb-4 border border-green-100">
+      {{ successMessage }}
+    </div>
+
+    <div class="flex border-b border-gray-200 mb-5" *ngIf="step === 'email'">
+      <button type="button" (click)="toggleMode()"
+              [class.border-pharm-teal]="mode === 'login'"
+              [class.text-pharm-teal]="mode === 'login'"
+              [class.text-gray-400]="mode !== 'login'"
+              class="w-1/2 pb-3 text-center border-b-2 font-bold text-sm transition-colors">
+        Sign In
+      </button>
+      <button type="button" (click)="toggleMode()"
+              [class.border-pharm-teal]="mode === 'register'"
+              [class.text-pharm-teal]="mode === 'register'"
+              [class.text-gray-400]="mode !== 'register'"
+              class="w-1/2 pb-3 text-center border-b-2 font-bold text-sm transition-colors">
+        Register
+      </button>
+    </div>
+
     <!-- DIRECT LOGIN FORM -->
-    <form *ngIf="step === 'email'" [formGroup]="emailForm" (ngSubmit)="login()" class="flex-1">
+    <form *ngIf="mode === 'login' && step === 'email'" [formGroup]="emailForm" (ngSubmit)="login()" class="flex-1">
       <label class="block text-sm font-bold text-gray-700 mb-2">Select Your Role</label>
       <select [(ngModel)]="selectedRole" [ngModelOptions]="{standalone: true}"
               class="w-full px-4 py-3 rounded-md border border-gray-300 focus:border-pharm-teal focus:ring-1 focus:ring-pharm-teal outline-none bg-white transition-all mb-4 text-sm text-pharm-dark font-medium">
@@ -38,7 +59,48 @@
       
       <button type="submit" [disabled]="emailForm.invalid"
               class="w-full bg-pharm-teal hover:bg-pharm-teal-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-md transition-colors">
-        Sign In / Register
+        Sign In
+      </button>
+    </form>
+
+    <!-- REGISTRATION EMAIL FORM -->
+    <form *ngIf="mode === 'register' && step === 'email'" [formGroup]="emailForm" (ngSubmit)="sendRegistrationOtp()" class="flex-1">
+      <label class="block text-sm font-bold text-gray-700 mb-2">Register As</label>
+      <select [(ngModel)]="selectedRole" [ngModelOptions]="{standalone: true}"
+              class="w-full px-4 py-3 rounded-md border border-gray-300 focus:border-pharm-teal focus:ring-1 focus:ring-pharm-teal outline-none bg-white transition-all mb-4 text-sm text-pharm-dark font-medium">
+        <option value="Customer">Customer</option>
+        <option value="Vendor">Vendor</option>
+        <option value="Doctor">Doctor</option>
+      </select>
+
+      <label class="block text-sm font-bold text-gray-700 mb-2">Enter your Email ID</label>
+      <input type="email" formControlName="email" placeholder="example@domain.com"
+             class="w-full px-4 py-3 rounded-md border border-gray-300 focus:border-pharm-teal focus:ring-1 focus:ring-pharm-teal outline-none transition-all mb-6">
+      
+      <button type="submit" [disabled]="emailForm.invalid"
+              class="w-full bg-pharm-teal hover:bg-pharm-teal-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-md transition-colors">
+        Send Registration OTP
+      </button>
+    </form>
+
+    <!-- REGISTRATION OTP FORM -->
+    <form *ngIf="mode === 'register' && step === 'otp'" [formGroup]="otpForm" (ngSubmit)="verifyRegistrationOtp()" class="flex-1">
+      <p class="text-sm text-gray-500 mb-5">
+        Enter the 6-digit code sent to <strong class="text-pharm-dark">{{ emailForm.value.email }}</strong>.
+      </p>
+
+      <label class="block text-sm font-bold text-gray-700 mb-2">OTP Code</label>
+      <input type="text" formControlName="code" placeholder="000000" maxlength="6"
+             inputmode="numeric" autocomplete="off" pattern="[0-9]*" (paste)="$event.preventDefault()"
+             class="w-full px-4 py-3 rounded-md border border-gray-300 focus:border-pharm-teal focus:ring-1 focus:ring-pharm-teal outline-none transition-all mb-6 text-center tracking-[0.5em] font-bold">
+      
+      <button type="submit" [disabled]="otpForm.invalid"
+              class="w-full bg-pharm-teal hover:bg-pharm-teal-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-md transition-colors mb-3">
+        Verify & Register
+      </button>
+      <button type="button" (click)="step = 'email'; otpForm.reset(); errorMessage = ''; successMessage = ''"
+              class="w-full border border-gray-300 hover:bg-gray-50 text-pharm-dark font-bold py-3 rounded-md transition-colors">
+        Back
       </button>
     </form>
 

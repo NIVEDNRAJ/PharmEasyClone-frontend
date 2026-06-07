@@ -1,0 +1,42 @@
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of LabTestsComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/lab-tests/lab-tests.ts:11:39:
+[37m      11 │   imports: [CommonModule, FormsModule, [32mRouterLink[37m],
+         ╵                                        [32m~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of UploadPrescriptionComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/prescription/upload-prescription.ts:11:39:
+[37m      11 │   imports: [CommonModule, FormsModule, [32mRouterLink[37m],
+         ╵                                        [32m~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of ProductSearchComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/product-search/product-search.ts:11:26:
+[37m      11 │   imports: [CommonModule, [32mRouterLink[37m, FormsModule],
+         ╵                           [32m~~~~~~~~~~[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of LabTestsComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/lab-tests/lab-tests.ts:11:39:
+[37m      11 │   imports: [CommonModule, FormsModule, [32mRouterLink[37m],
+         ╵                                        [32m~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of UploadPrescriptionComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/prescription/upload-prescription.ts:11:39:
+[37m      11 │   imports: [CommonModule, FormsModule, [32mRouterLink[37m],
+         ╵                                        [32m~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of ProductSearchComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/product-search/product-search.ts:11:26:
+[37m      11 │   imports: [CommonModule, [32mRouterLink[37m, FormsModule],
+         ╵                           [32m~~~~~~~~~~[0m
+
+[39m[22m

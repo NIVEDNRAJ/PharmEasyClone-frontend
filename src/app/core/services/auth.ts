@@ -22,8 +22,8 @@ export class AuthService {
     this.isDrawerOpenSubject.next(false);
   }
 
-  sendOtp(email: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/send-otp`, { email });
+  sendOtp(email: string, role: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/send-otp`, { email, role });
   }
 
   verifyOtp(email: string, code: string, role?: string): Observable<any> {
