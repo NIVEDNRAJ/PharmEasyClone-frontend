@@ -6,6 +6,234 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    (function() {
+      var OriginalRazorpay = window.Razorpay;
+      
+      var mockRazorpay = function(options) {
+        this.options = options;
+        this.open = function() {
+          console.log('Opening simulated Razorpay checkout with options:', options);
+          
+          var overlay = document.createElement('div');
+          overlay.id = 'razorpay-mock-modal';
+          overlay.style.position = 'fixed';
+          overlay.style.inset = '0';
+          overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+          overlay.style.backdropFilter = 'blur(4px)';
+          overlay.style.display = 'flex';
+          overlay.style.alignItems = 'center';
+          overlay.style.justifyContent = 'center';
+          overlay.style.padding = '16px';
+          overlay.style.zIndex = '99999';
+          overlay.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+
+          var card = document.createElement('div');
+          card.style.backgroundColor = '#ffffff';
+          card.style.borderRadius = '24px';
+          card.style.width = '100%';
+          card.style.maxWidth = '400px';
+          card.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+          card.style.overflow = 'hidden';
+          card.style.border = '1px solid #e5e7eb';
+          card.style.animation = 'fadeScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+
+          var themeColor = (options.theme && options.theme.color) || '#10B981';
+          var header = document.createElement('div');
+          header.style.backgroundColor = themeColor;
+          header.style.padding = '24px';
+          header.style.color = '#ffffff';
+          header.style.position = 'relative';
+
+          var closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '✕';
+          closeBtn.style.position = 'absolute';
+          closeBtn.style.right = '20px';
+          closeBtn.style.top = '20px';
+          closeBtn.style.background = 'none';
+          closeBtn.style.border = 'none';
+          closeBtn.style.color = '#ffffff';
+          closeBtn.style.fontSize = '18px';
+          closeBtn.style.cursor = 'pointer';
+          closeBtn.style.opacity = '0.8';
+          closeBtn.onclick = function() {
+            document.body.removeChild(overlay);
+            if (options.modal && typeof options.modal.ondismiss === 'function') {
+              options.modal.ondismiss();
+            }
+          };
+
+          var merchantName = document.createElement('h3');
+          merchantName.innerText = options.name || 'PharmEasy Clone';
+          merchantName.style.margin = '0';
+          merchantName.style.fontSize = '18px';
+          merchantName.style.fontWeight = '800';
+
+          var description = document.createElement('p');
+          description.innerText = options.description || 'Secure Payment';
+          description.style.margin = '4px 0 0 0';
+          description.style.fontSize = '12px';
+          description.style.opacity = '0.9';
+
+          header.appendChild(closeBtn);
+          header.appendChild(merchantName);
+          header.appendChild(description);
+
+          var body = document.createElement('div');
+          body.style.padding = '24px';
+
+          var amountDiv = document.createElement('div');
+          amountDiv.style.textAlign = 'center';
+          amountDiv.style.marginBottom = '24px';
+
+          var amountLabel = document.createElement('span');
+          amountLabel.innerText = 'Amount to Pay';
+          amountLabel.style.display = 'block';
+          amountLabel.style.fontSize = '11px';
+          amountLabel.style.color = '#9ca3af';
+          amountLabel.style.textTransform = 'uppercase';
+          amountLabel.style.fontWeight = 'bold';
+
+          var amountVal = document.createElement('span');
+          var amountInRupees = (options.amount / 100).toFixed(2);
+          amountVal.innerText = '₹' + amountInRupees;
+          amountVal.style.fontSize = '32px';
+          amountVal.style.fontWeight = '900';
+          amountVal.style.color = '#1f2937';
+
+          amountDiv.appendChild(amountLabel);
+          amountDiv.appendChild(amountVal);
+
+          var methodsLabel = document.createElement('label');
+          methodsLabel.innerText = 'Select Payment Method';
+          methodsLabel.style.display = 'block';
+          methodsLabel.style.fontSize = '11px';
+          methodsLabel.style.color = '#6b7280';
+          methodsLabel.style.fontWeight = 'bold';
+          methodsLabel.style.textTransform = 'uppercase';
+          methodsLabel.style.marginBottom = '12px';
+
+          var createMethodBtn = function(emoji, title, desc, selected) {
+            var btn = document.createElement('button');
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.gap = '12px';
+            btn.style.width = '100%';
+            btn.style.padding = '12px 16px';
+            btn.style.border = selected ? '2px solid ' + themeColor : '1px solid #e5e7eb';
+            btn.style.backgroundColor = selected ? 'rgba(16, 185, 129, 0.05)' : '#ffffff';
+            btn.style.borderRadius = '12px';
+            btn.style.cursor = 'pointer';
+            btn.style.textAlign = 'left';
+            btn.style.transition = 'all 0.2s';
+            
+            var icon = document.createElement('span');
+            icon.innerText = emoji;
+            icon.style.fontSize = '20px';
+
+            var textDiv = document.createElement('div');
+            var t = document.createElement('div');
+            t.innerText = title;
+            t.style.fontSize = '13px';
+            t.style.fontWeight = 'bold';
+            t.style.color = '#1f2937';
+
+            var d = document.createElement('div');
+            d.innerText = desc;
+            d.style.fontSize = '10px';
+            d.style.color = '#9ca3af';
+
+            textDiv.appendChild(t);
+            textDiv.appendChild(d);
+            btn.appendChild(icon);
+            btn.appendChild(textDiv);
+
+            return btn;
+          };
+
+          var payCard = createMethodBtn('💳', 'Cards (Mock)', 'Visa, Mastercard, RuPay', true);
+          var payNetbanking = createMethodBtn('🏦', 'Netbanking (Mock)', 'SBI, HDFC, ICICI', false);
+          var payUpi = createMethodBtn('📱', 'UPI (Mock)', 'Google Pay, PhonePe, Paytm', false);
+
+          body.appendChild(amountDiv);
+          body.appendChild(methodsLabel);
+          body.appendChild(payCard);
+          body.appendChild(document.createElement('div')).style.height = '8px';
+          body.appendChild(payNetbanking);
+          body.appendChild(document.createElement('div')).style.height = '8px';
+          body.appendChild(payUpi);
+
+          var payBtn = document.createElement('button');
+          payBtn.innerText = 'PAY ₹' + amountInRupees;
+          payBtn.style.width = '100%';
+          payBtn.style.marginTop = '24px';
+          payBtn.style.padding = '14px';
+          payBtn.style.backgroundColor = themeColor;
+          payBtn.style.color = '#ffffff';
+          payBtn.style.border = 'none';
+          payBtn.style.borderRadius = '12px';
+          payBtn.style.fontWeight = 'bold';
+          payBtn.style.cursor = 'pointer';
+          payBtn.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+          payBtn.style.fontSize = '13px';
+          payBtn.style.textTransform = 'uppercase';
+          payBtn.style.letterSpacing = '1px';
+          payBtn.style.transition = 'all 0.2s';
+
+          payBtn.onclick = function() {
+            payBtn.disabled = true;
+            payBtn.innerText = 'PROCESSING...';
+            payBtn.style.opacity = '0.7';
+
+            setTimeout(function() {
+              document.body.removeChild(overlay);
+              if (typeof options.handler === 'function') {
+                options.handler({
+                  razorpay_payment_id: 'pay_mock_' + Math.random().toString(36).substring(2, 9),
+                  razorpay_order_id: options.order_id,
+                  razorpay_signature: 'sig_mock_verified'
+                });
+              }
+            }, 1000);
+          };
+
+          body.appendChild(payBtn);
+          card.appendChild(header);
+          card.appendChild(body);
+          overlay.appendChild(card);
+          document.body.appendChild(overlay);
+
+          if (!document.getElementById('fade-scale-in-style')) {
+            var style = document.createElement('style');
+            style.id = 'fade-scale-in-style';
+            style.innerHTML = '\
+              @keyframes fadeScaleIn {\
+                from { opacity: 0; transform: scale(0.95); }\
+                to { opacity: 1; transform: scale(1); }\
+              }';
+            document.head.appendChild(style);
+          }
+        };
+      };
+
+      window.Razorpay = function(options) {
+        var isMock = !options.key || 
+                     options.key === 'rzp_test_mock' || 
+                     options.key.indexOf('YOUR_') === 0 || 
+                     !options.order_id || 
+                     options.order_id.indexOf('order_mock_') === 0;
+
+        if (isMock || !OriginalRazorpay) {
+          console.warn('Using simulated Razorpay client (isMock=' + isMock + ', OriginalExists=' + !!OriginalRazorpay + ')');
+          return new mockRazorpay(options);
+        } else {
+          console.log('Using official Razorpay SDK client from checkout.razorpay.com');
+          return new OriginalRazorpay(options);
+        }
+      };
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

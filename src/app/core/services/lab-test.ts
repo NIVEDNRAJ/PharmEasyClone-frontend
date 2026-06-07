@@ -28,6 +28,15 @@ export class LabTestService {
     return this.http.post(`${this.apiUrl}/book`, data);
   }
 
+  confirmBooking(confirmDto: {
+    bookingId: string;
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/confirm`, confirmDto);
+  }
+
   getMyBookings(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/bookings`);
   }

@@ -5,6 +5,8 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { DoctorService } from '../../../core/services/doctor';
 import { AuthService } from '../../../core/services/auth';
 
+declare var Razorpay: any;
+
 @Component({
   selector: 'app-consult-summary',
   standalone: true,
@@ -54,9 +56,6 @@ export class ConsultSummaryComponent implements OnInit {
 
   // Payment UI state
   isSubmitting = false;
-  showSimulatedPayment = false;
-  mockOrderId = '';
-  mockBookingId = '';
 
   ngOnInit() {
     this.generateCalendarDates();
@@ -183,16 +182,13 @@ export class ConsultSummaryComponent implements OnInit {
 
     this.doctorService.bookConsultation(bookingDto).subscribe({
       next: (res) => {
+        this.isSubmitting = false;
+        const keyId = res.razorpayKeyId;
         const orderId = res.razorpayOrderId;
         const bookingId = res.bookingId;
-        const keyId = res.razorpayKeyId;
+        const amount = res.paidAmount;
 
-        this.mockOrderId = orderId;
-        this.mockBookingId = bookingId;
-
-        // Trigger Simulated Checkout Dialog
-        this.isSubmitting = false;
-        this.showSimulatedPayment = true;
+        this.openRazorpayCheckout(keyId, orderId, bookingId, amount);
       },
       error: (err) => {
         alert(err?.error?.message || 'Failed to create booking order. Please try again.');
@@ -201,31 +197,54 @@ export class ConsultSummaryComponent implements OnInit {
     });
   }
 
-  // Handle Mock Payment Success
-  confirmSimulatedSuccess() {
-    this.showSimulatedPayment = false;
-    this.isSubmitting = true;
+  openRazorpayCheckout(keyId: string, orderId: string, bookingId: string, amount: number) {
+    const options = {
+      key: keyId,
+      amount: Math.round(amount * 100), // amount in paise
+      currency: 'INR',
+      name: 'PharmEasy Clone',
+      description: 'Doctor Consultation Booking',
+      order_id: orderId,
+      handler: (response: any) => {
+        this.isSubmitting = true;
+        const confirmDto = {
+          bookingId: bookingId,
+          razorpayOrderId: response.razorpay_order_id,
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpaySignature: response.razorpay_signature
+        };
 
-    const confirmDto = {
-      bookingId: this.mockBookingId,
-      razorpayOrderId: this.mockOrderId,
-      razorpayPaymentId: 'pay_mock_' + Math.random().toString(36).substring(2, 9),
-      razorpaySignature: 'sig_mock_verified'
+        this.doctorService.confirmBooking(confirmDto).subscribe({
+          next: (res) => {
+            this.isSubmitting = false;
+            this.router.navigate(['/doctor-consult/confirmation'], { queryParams: { bookingId: res.bookingId } });
+          },
+          error: (err) => {
+            alert(err?.error?.message || 'Payment confirmation failed on server.');
+            this.isSubmitting = false;
+          }
+        });
+      },
+      prefill: {
+        email: localStorage.getItem('user_email') || '',
+        name: this.bookingForm.value.patientName || ''
+      },
+      theme: {
+        color: '#10B981'
+      },
+      modal: {
+        ondismiss: () => {
+          this.isSubmitting = false;
+        }
+      }
     };
 
-    this.doctorService.confirmBooking(confirmDto).subscribe({
-      next: (res) => {
-        this.isSubmitting = false;
-        this.router.navigate(['/doctor-consult/confirmation'], { queryParams: { bookingId: res.bookingId } });
-      },
-      error: (err) => {
-        alert(err?.error?.message || 'Payment confirmation failed on server.');
-        this.isSubmitting = false;
-      }
-    });
-  }
-
-  cancelSimulatedPayment() {
-    this.showSimulatedPayment = false;
+    try {
+      const rzp = new Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error('Failed to open Razorpay checkout:', err);
+      alert('Failed to initialize Razorpay payment. Please check your internet connection.');
+    }
   }
 }

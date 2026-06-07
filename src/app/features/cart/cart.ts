@@ -7,6 +7,8 @@ import { CartService, CartItem } from '../../core/services/cart';
 import { OrderService } from '../../core/services/order';
 import { AuthService } from '../../core/services/auth';
 
+declare var Razorpay: any;
+
 @Component({
   selector: 'app-cart',
   standalone: true,
@@ -39,9 +41,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
   // State
   isSubmitting = false;
-  showSimulatedPayment = false;
-  mockOrderId = '';
-  mockOrderGuidId = '';
 
   ngOnInit() {
     this.cartSub = this.cartService.cartItems$.subscribe(items => {
@@ -110,11 +109,13 @@ export class CartComponent implements OnInit, OnDestroy {
 
     this.orderService.placeOrder(orderDto).subscribe({
       next: (res) => {
-        this.mockOrderId = res.razorpayOrderId;
-        this.mockOrderGuidId = res.orderId;
-
         this.isSubmitting = false;
-        this.showSimulatedPayment = true;
+        const keyId = res.razorpayKeyId;
+        const orderId = res.razorpayOrderId;
+        const orderGuidId = res.orderId;
+        const amount = res.paidAmount;
+
+        this.openRazorpayCheckout(keyId, orderId, orderGuidId, amount);
       },
       error: (err) => {
         alert(err?.error?.message || 'Failed to place order. Please try again.');
@@ -123,32 +124,56 @@ export class CartComponent implements OnInit, OnDestroy {
     });
   }
 
-  confirmSimulatedSuccess() {
-    this.showSimulatedPayment = false;
-    this.isSubmitting = true;
+  openRazorpayCheckout(keyId: string, orderId: string, orderGuidId: string, amount: number) {
+    const options = {
+      key: keyId,
+      amount: Math.round(amount * 100), // amount in paise
+      currency: 'INR',
+      name: 'PharmEasy Clone',
+      description: 'Medicine Order Purchase',
+      order_id: orderId,
+      handler: (response: any) => {
+        this.isSubmitting = true;
+        const confirmDto = {
+          orderId: orderGuidId,
+          razorpayOrderId: response.razorpay_order_id,
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpaySignature: response.razorpay_signature
+        };
 
-    const confirmDto = {
-      orderId: this.mockOrderGuidId,
-      razorpayOrderId: this.mockOrderId,
-      razorpayPaymentId: 'pay_mock_' + Math.random().toString(36).substring(2, 9),
-      razorpaySignature: 'sig_mock_verified'
+        this.orderService.confirmOrder(confirmDto).subscribe({
+          next: () => {
+            this.cartService.clearCart();
+            this.isSubmitting = false;
+            alert('Order placed successfully!');
+            this.router.navigate(['/doctor-consult/history']);
+          },
+          error: (err) => {
+            alert(err?.error?.message || 'Order payment confirmation failed.');
+            this.isSubmitting = false;
+          }
+        });
+      },
+      prefill: {
+        email: localStorage.getItem('user_email') || '',
+        name: this.checkoutForm.value.patientName || ''
+      },
+      theme: {
+        color: '#10B981'
+      },
+      modal: {
+        ondismiss: () => {
+          this.isSubmitting = false;
+        }
+      }
     };
 
-    this.orderService.confirmOrder(confirmDto).subscribe({
-      next: () => {
-        this.cartService.clearCart();
-        this.isSubmitting = false;
-        alert('Order placed successfully!');
-        this.router.navigate(['/doctor-consult/history']); // Redirect to consultation or orders history page. Let's navigate to order history page!
-      },
-      error: (err) => {
-        alert(err?.error?.message || 'Order payment confirmation failed.');
-        this.isSubmitting = false;
-      }
-    });
-  }
-
-  cancelSimulatedPayment() {
-    this.showSimulatedPayment = false;
+    try {
+      const rzp = new Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error('Failed to open Razorpay checkout:', err);
+      alert('Failed to initialize Razorpay payment. Please check your internet connection.');
+    }
   }
 }
