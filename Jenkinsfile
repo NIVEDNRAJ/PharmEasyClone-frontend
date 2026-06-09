@@ -1,38 +1,56 @@
 pipeline {
-    agent any
-
-    environment {
-        IMAGE_NAME = 'pharmeasy-frontend'
-        IMAGE_TAG = 'latest'
-        CONTAINER_NAME = 'pharmeasy-frontend'
-    }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                bat 'docker build -t %IMAGE_NAME%:%IMAGE_TAG% .'
-            }
-        }
-
-        stage('Remove Existing Container') {
-            steps {
-                bat '''
-                docker stop %CONTAINER_NAME% 2>nul
-                docker rm %CONTAINER_NAME% 2>nul
-                '''
-            }
-        }
-
-        stage('Run Container') {
-            steps {
-                bat 'docker run -d --name %CONTAINER_NAME% -p 4200:80 %IMAGE_NAME%:%IMAGE_TAG%'
-            }
-        }
+ 
+agent any
+ 
+environment {
+ 
+IMAGE = "pharmeasy-frontend:${BUILD_NUMBER}"
+ 
+CONT = "pharmeasy-frontend"
+ 
+}
+ 
+stages {
+ 
+stage('Checkout') {
+ 
+steps { checkout scm }
+ 
+}
+ 
+stage('Debug') {
+    steps {
+        bat 'echo IMAGE=%IMAGE%'
     }
 }
+ 
+stage('Build Docker Image') {
+ 
+steps {
+bat 'docker build -t %IMAGE% .'
+ 
+}
+ 
+}
+ 
+stage('Run Container') {
+ 
+steps {
+ 
+bat 'docker rm -f %CONT% || true'
+ 
+bat 'docker run -d --name %CONT% -p 8081:80 %IMAGE%'
+ 
+}
+ 
+}
+// stage('Run Container') {
+//     steps {
+//         bat 'docker rm -f %CONT% || true'
+//         bat 'docker run -d --name %CONT% --network your_backend_network -p 8081:80 %IMAGE%'
+//     }
+// }
+ 
+}
+}
+ 
