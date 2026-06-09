@@ -1,0 +1,59 @@
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold text-pharm-dark mb-2">Order with Prescription</h1>
+  <p class="text-gray-500 text-sm mb-8">Upload your prescription and we will deliver your medicines at your doorstep</p>
+
+  <div class="grid md:grid-cols-4 gap-4 mb-8">
+    @for (s of [
+      { n: 1, t: 'Upload prescription' },
+      { n: 2, t: 'Add delivery address' },
+      { n: 3, t: 'We call to confirm' },
+      { n: 4, t: 'Medicines delivered' }
+    ]; track s.n) {
+      <div class="bg-white rounded-xl p-4 border text-center">
+        <div class="w-8 h-8 bg-pharm-teal text-white rounded-full flex items-center justify-center mx-auto text-sm font-bold">{{ s.n }}</div>
+        <p class="text-xs mt-2 text-gray-600 font-medium">{{ s.t }}</p>
+      </div>
+    }
+  </div>
+
+  @if (message) { <div class="bg-green-50 text-green-700 px-4 py-3 rounded-lg mb-4">{{ message }}</div> }
+  @if (error) { <div class="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-4">{{ error }}</div> }
+
+  <div class="bg-white rounded-xl border p-6 shadow-sm mb-8">
+    <h3 class="font-bold mb-4">Upload Prescription</h3>
+    <div class="space-y-3">
+      <input [(ngModel)]="form.patientName" placeholder="Patient name *" class="w-full border rounded-lg px-3 py-2 text-sm" />
+      <input [(ngModel)]="form.deliveryAddress" placeholder="Delivery address *" class="w-full border rounded-lg px-3 py-2 text-sm" />
+      <input [(ngModel)]="form.pincode" placeholder="Pincode" class="w-full border rounded-lg px-3 py-2 text-sm" />
+      <input [(ngModel)]="form.imageUrl" placeholder="Prescription image URL (optional)" class="w-full border rounded-lg px-3 py-2 text-sm" />
+      <textarea [(ngModel)]="form.notes" placeholder="Additional notes" class="w-full border rounded-lg px-3 py-2 text-sm" rows="2"></textarea>
+      <div class="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center text-gray-400 text-sm">
+        <p>Drag & drop prescription image here</p>
+        <p class="text-xs mt-1">Or paste an image URL above</p>
+      </div>
+      <button (click)="upload()" [disabled]="isLoading"
+        class="w-full bg-pharm-teal hover:bg-pharm-teal-dark text-white py-3 rounded-lg font-semibold text-sm disabled:opacity-50">
+        {{ isLoading ? 'Uploading...' : 'Upload Prescription' }}
+      </button>
+    </div>
+  </div>
+
+  @if (prescriptions.length > 0) {
+    <h3 class="font-bold mb-4">Your Prescription Orders</h3>
+    <div class="space-y-3">
+      @for (rx of prescriptions; track rx.id) {
+        <div class="bg-white rounded-xl border p-4 flex justify-between items-center">
+          <div>
+            <p class="font-bold">{{ rx.patientName }}</p>
+            <p class="text-sm text-gray-500">{{ rx.deliveryAddress }}, {{ rx.pincode }}</p>
+            <p class="text-xs text-gray-400">{{ rx.createdAt | date:'medium' }}</p>
+          </div>
+          <span class="text-xs font-bold px-3 py-1 rounded-full"
+            [class.bg-yellow-100]="rx.status === 'Pending'"
+            [class.bg-green-100]="rx.status === 'Verified' || rx.status === 'Fulfilled'"
+            [class.bg-red-100]="rx.status === 'Rejected'">{{ rx.status }}</span>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,52 @@
+
+> pharm-easy-clone-frontend@0.0.0 start
+> ng serve --host localhost --port 4200
+
+[33m>[39m Building...
+[32m√[39m Building...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m              [2m | [22m [1mRaw size[22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m               [2m | [22m [36m71.01 kB[39m[2m | [22m
+[32mstyles.css[39m         [2m | [22m[2mstyles[22m             [2m | [22m [36m40.19 kB[39m[2m | [22m
+[32mchunk-VMEPKDBZ.js[39m  [2m | [22m[2m-[22m                  [2m | [22m  [36m3.55 kB[39m[2m | [22m
+[32mchunk-B7DUQIE3.js[39m  [2m | [22m[2m-[22m                  [2m | [22m  [36m3.04 kB[39m[2m | [22m
+[32mchunk-YQOESBWP.js[39m  [2m | [22m[2m-[22m                  [2m | [22m[36m754 bytes[39m[2m | [22m
+[32mchunk-3BIMAWS3.js[39m  [2m | [22m[2m-[22m                  [2m | [22m[36m187 bytes[39m[2m | [22m
+[32mpolyfills.js[39m       [2m | [22m[2mpolyfills[22m          [2m | [22m [36m95 bytes[39m[2m | [22m
+
+[1m [22m                  [2m | [22m[1mInitial total[22m      [2m | [22m[1m118.83 kB[22m
+
+[1mLazy chunk files[22m   [2m | [22m[1mNames[22m              [2m | [22m [1mRaw size[22m
+[32mchunk-O7TZ6BC6.js[39m  [2m | [22m[2mbooking-history[22m    [2m | [22m [36m70.75 kB[39m[2m | [22m
+[32mchunk-VQ6QAAIK.js[39m  [2m | [22m[2mconsult-summary[22m    [2m | [22m [36m59.11 kB[39m[2m | [22m
+[32mchunk-QSXXV6L6.js[39m  [2m | [22m[2madmin-dashboard[22m    [2m | [22m [36m49.49 kB[39m[2m | [22m
+[32mchunk-ISGI7REI.js[39m  [2m | [22m[2mlogin[22m              [2m | [22m [36m44.46 kB[39m[2m | [22m
+[32mchunk-BOILPIMS.js[39m  [2m | [22m[2mcart[22m               [2m | [22m [36m37.53 kB[39m[2m | [22m
+[32mchunk-C7UNTY6V.js[39m  [2m | [22m[2mvendor-dashboard[22m   [2m | [22m [36m34.99 kB[39m[2m | [22m
+[32mchunk-CG3WULMD.js[39m  [2m | [22m[2mdoctor-dashboard[22m   [2m | [22m [36m33.30 kB[39m[2m | [22m
+[32mchunk-EMEVROCS.js[39m  [2m | [22m[2mconsult-home[22m       [2m | [22m [36m30.13 kB[39m[2m | [22m
+[32mchunk-PBS2KMZY.js[39m  [2m | [22m[2mhome[22m               [2m | [22m [36m26.32 kB[39m[2m | [22m
+[32mchunk-4MPYSR5R.js[39m  [2m | [22m[2mproduct-detail[22m     [2m | [22m [36m24.65 kB[39m[2m | [22m
+[32mchunk-AEP44ACX.js[39m  [2m | [22m[2mproduct-search[22m     [2m | [22m [36m24.30 kB[39m[2m | [22m
+[32mchunk-X2BQBHVO.js[39m  [2m | [22m[2mlab-tests[22m          [2m | [22m [36m23.47 kB[39m[2m | [22m
+[32mchunk-EULXGVRO.js[39m  [2m | [22m[2morder-history[22m      [2m | [22m [36m20.48 kB[39m[2m | [22m
+[32mchunk-JCFNQ63E.js[39m  [2m | [22m[2mupload-prescription[22m[2m | [22m [36m19.61 kB[39m[2m | [22m
+[32mchunk-BP7SCZ3S.js[39m  [2m | [22m[2mdoctor-list[22m        [2m | [22m [36m17.16 kB[39m[2m | [22m
+[2m...and 5 more lazy chunks files. Use "--verbose" to show all the files.[22m
+
+Application bundle generation complete. [8.369 seconds] - 2026-06-07T06:55:10.217Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+[2m12:25:10 pm[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m Re-optimizing dependencies because vite config has changed
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m4200[22m/[39m
+[33m>[39m Changes detected. Rebuilding...
+[32m√[39m Changes detected. Rebuilding...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m[2m | [22m[1mRaw size[22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m [2m | [22m[36m71.35 kB[39m[2m | [22m
+
+[1mLazy chunk files[22m   [2m | [22m[1mNames[22m[2m | [22m[1mRaw size[22m
+[32mchunk-CXSYIOR5.js[39m  [2m | [22m[2mlogin[22m[2m | [22m[36m44.81 kB[39m[2m | [22m
+
+Application bundle generation complete. [2.244 seconds] - 2026-06-07T06:57:08.553Z
+
+Component update sent to client(s).

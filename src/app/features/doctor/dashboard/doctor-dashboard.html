@@ -1,0 +1,104 @@
+<div class="min-h-screen bg-pharm-light">
+  <div class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
+    <div>
+      <h1 class="text-xl font-bold">Doctor Dashboard</h1>
+      <p class="text-sm text-blue-200">Manage consultations & profile</p>
+    </div>
+    <div class="flex gap-4 items-center">
+      <a routerLink="/" class="text-sm hover:underline">Back to Store</a>
+      <button (click)="authService.logout()" class="text-sm text-red-200">Logout</button>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 py-6">
+    @if (stats && stats.isApproved === false && activeTab === 'overview') {
+      <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-4 text-sm">
+        Your doctor account is pending admin approval. You can view/update your profile but cannot manage consultations or receive bookings yet.
+      </div>
+    }
+
+    <div class="flex gap-2 flex-wrap mb-6">
+      @for (tab of [
+        { id: 'overview', label: 'Overview' },
+        { id: 'appointments', label: 'Appointments', requireApproval: true },
+        { id: 'profile', label: 'Profile' }
+      ]; track tab.id) {
+        @if (!tab.requireApproval || stats?.isApproved) {
+          <button (click)="setTab($any(tab.id))"
+            [class.bg-blue-700]="activeTab === tab.id"
+            [class.text-white]="activeTab === tab.id"
+            class="px-4 py-2 rounded-lg text-sm font-semibold bg-white text-pharm-dark border">{{ tab.label }}</button>
+        }
+      }
+    </div>
+
+    @if (message) { <div class="bg-green-50 text-green-700 px-4 py-2 rounded-lg mb-4 text-sm">{{ message }}</div> }
+    @if (error) { <div class="bg-red-50 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm">{{ error }}</div> }
+
+    @if (isLoading) {
+      <div class="text-center py-12 text-gray-500">Loading...</div>
+    } @else {
+      @if (activeTab === 'overview') {
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-white rounded-xl p-5 shadow-sm border">
+            <p class="text-xs text-gray-500">Doctor</p>
+            <p class="text-lg font-bold">{{ stats.name }}</p>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm border">
+            <p class="text-xs text-gray-500">Specialty</p>
+            <p class="text-lg font-bold">{{ stats.specialty }}</p>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm border">
+            <p class="text-xs text-gray-500">Upcoming</p>
+            <p class="text-2xl font-bold text-blue-700">{{ stats.upcomingAppointments }}</p>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm border">
+            <p class="text-xs text-gray-500">Total Earnings</p>
+            <p class="text-2xl font-bold text-green-600">₹{{ stats.totalEarnings }}</p>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'appointments') {
+        <div class="space-y-4">
+          @for (a of appointments; track a.id) {
+            <div class="bg-white rounded-xl p-4 shadow-sm border">
+              <div class="flex justify-between items-start gap-4">
+                <div>
+                  <h3 class="font-bold">{{ a.patientName }}</h3>
+                  <p class="text-sm text-gray-500">{{ a.customerEmail }} · {{ a.mode }} · ₹{{ a.paidAmount }}</p>
+                  <p class="text-xs text-gray-400">{{ a.bookingDate | date:'mediumDate' }} · {{ a.timeSlot }}</p>
+                  @if (a.symptoms) { <p class="text-xs mt-1 text-gray-600">Symptoms: {{ a.symptoms }}</p> }
+                </div>
+                <div class="flex flex-col gap-2 items-end">
+                  <span class="text-xs font-bold px-2 py-1 rounded" [class.bg-green-100]="a.bookingStatus === 'Completed'" [class.bg-yellow-100]="a.bookingStatus === 'Scheduled'">{{ a.bookingStatus }}</span>
+                  @if (a.bookingStatus === 'Scheduled') {
+                    <button (click)="joinConsultation(a)" class="bg-blue-700 text-white px-3 py-1 rounded text-xs">Join</button>
+                    <button (click)="updateStatus(a.id, 'Completed')" class="bg-pharm-teal text-white px-3 py-1 rounded text-xs">Complete</button>
+                    <button (click)="updateStatus(a.id, 'Cancelled')" class="bg-red-500 text-white px-3 py-1 rounded text-xs">Cancel</button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+          @if (appointments.length === 0) { <p class="text-gray-500 text-center py-8">No appointments yet.</p> }
+        </div>
+      }
+
+      @if (activeTab === 'profile') {
+        <div class="bg-white rounded-xl p-6 shadow-sm border max-w-lg">
+          <h3 class="font-bold mb-4">Doctor Profile</h3>
+          <div class="space-y-3">
+            <input [(ngModel)]="profile.name" placeholder="Name" class="w-full border rounded-lg px-3 py-2 text-sm" />
+            <input [(ngModel)]="profile.specialty" placeholder="Specialty" class="w-full border rounded-lg px-3 py-2 text-sm" />
+            <input [(ngModel)]="profile.qualifications" placeholder="Qualifications" class="w-full border rounded-lg px-3 py-2 text-sm" />
+            <input [(ngModel)]="profile.experienceYears" type="number" placeholder="Experience (years)" class="w-full border rounded-lg px-3 py-2 text-sm" />
+            <input [(ngModel)]="profile.languages" placeholder="Languages" class="w-full border rounded-lg px-3 py-2 text-sm" />
+            <input [(ngModel)]="profile.consultationFee" type="number" placeholder="Consultation fee" class="w-full border rounded-lg px-3 py-2 text-sm" />
+            <button (click)="saveProfile()" class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-semibold">Save Profile</button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

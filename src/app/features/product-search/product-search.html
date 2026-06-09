@@ -1,0 +1,116 @@
+<div class="bg-pharm-light min-h-screen pb-16">
+  <!-- Search Input Area -->
+  <div class="bg-white border-b border-gray-100 py-6 px-4 shadow-sm">
+    <div class="max-w-4xl mx-auto flex gap-3">
+      <input [(ngModel)]="searchQuery" 
+             (keyup.enter)="onSearch()"
+             placeholder="Search for medicines or healthcare products..."
+             class="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-pharm-teal text-sm text-pharm-dark placeholder-gray-400">
+      <button (click)="onSearch()" 
+              class="bg-pharm-teal hover:bg-pharm-teal-dark text-white font-bold text-sm px-8 py-3 rounded-lg transition-colors uppercase">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      
+      <!-- Left Sidebar: Filters -->
+      <div class="space-y-6">
+        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm space-y-4">
+          <h2 class="text-sm font-bold text-pharm-dark border-b border-gray-50 pb-2">Filter by Category</h2>
+          
+          <div class="space-y-2">
+            <button (click)="onCategorySelect('')" 
+                    [class.text-pharm-teal]="selectedCategory === ''"
+                    [class.font-bold]="selectedCategory === ''"
+                    [class.text-gray-500]="selectedCategory !== ''"
+                    class="w-full text-left text-xs py-1.5 hover:text-pharm-teal transition-colors block">
+              All Categories
+            </button>
+            <button *ngFor="let cat of categoriesList"
+                    (click)="onCategorySelect(cat)"
+                    [class.text-pharm-teal]="selectedCategory === cat"
+                    [class.font-bold]="selectedCategory === cat"
+                    [class.text-gray-500]="selectedCategory !== cat"
+                    class="w-full text-left text-xs py-1.5 hover:text-pharm-teal transition-colors block">
+              {{ cat }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side: Results Grid -->
+      <div class="lg:col-span-3 space-y-6">
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-bold text-pharm-dark">
+            Showing {{ products.length }} results 
+            <span *ngIf="searchQuery">for "{{ searchQuery }}"</span>
+            <span *ngIf="selectedCategory">in {{ selectedCategory }}</span>
+          </h3>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+          <div *ngFor="let item of [1,2,3,4,5,6]" class="bg-white h-[320px] rounded-xl border border-gray-100 shadow-sm animate-pulse"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && products.length === 0" class="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm max-w-md mx-auto mt-12 space-y-4">
+          <span class="text-5xl block">🔍</span>
+          <h3 class="text-base font-bold text-pharm-dark">No products found</h3>
+          <p class="text-xs text-gray-400">We couldn't find matches for your query. Try checking spelling or search general medicine names like "Shelcal" or "Evion".</p>
+        </div>
+
+        <!-- Products Grid -->
+        <div *ngIf="!isLoading && products.length > 0" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+          <div *ngFor="let product of products" 
+               (click)="viewProduct(product.id)"
+               class="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all p-4 cursor-pointer relative group flex flex-col justify-between h-[340px]">
+            
+            <div>
+              <div class="h-32 w-full flex items-center justify-center mb-4 bg-pharm-light/20 rounded-lg p-2">
+                <img [src]="product.imageUrl || 'https://via.placeholder.com/150'" 
+                     [alt]="product.name" 
+                     class="max-h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-200">
+              </div>
+              
+              <h3 class="text-sm font-bold text-pharm-dark line-clamp-2 leading-tight mb-2 group-hover:text-pharm-teal transition-colors">
+                {{ product.name }}
+              </h3>
+              
+              <span *ngIf="product.requiresPrescription" class="inline-block px-2 py-0.5 bg-blue-50 text-blue-600 text-[9px] font-extrabold rounded uppercase tracking-wider">
+                Rx Required
+              </span>
+            </div>
+
+            <!-- Price and Add Actions -->
+            <div class="mt-4 border-t border-gray-50 pt-3 flex items-end justify-between">
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-1.5 text-[10px] text-gray-400">
+                  <span>MRP</span>
+                  <span class="line-through">₹{{ (product.bestPrice / (1 - (product.maxDiscount/100))) | number:'1.0-0' }}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-base font-extrabold text-pharm-dark">₹{{ product.bestPrice }}</span>
+                  <span *ngIf="product.maxDiscount > 0" class="text-[9px] font-bold text-red-500 bg-red-50 px-1 py-0.5 rounded">
+                    {{ product.maxDiscount }}% OFF
+                  </span>
+                </div>
+              </div>
+
+              <!-- Add Button -->
+              <button (click)="addToCart(product, $event)" 
+                      class="bg-pharm-teal hover:bg-pharm-teal-dark text-white font-extrabold text-[10px] w-16 py-2 rounded-lg transition-colors shadow uppercase">
+                Add
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

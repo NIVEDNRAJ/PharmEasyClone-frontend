@@ -1,0 +1,161 @@
+<div class="bg-pharm-light min-h-screen pb-32">
+  <div class="max-w-5xl mx-auto px-4 pt-8">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-pharm-dark">Shopping Cart</h1>
+      <p class="text-gray-500 text-sm mt-0.5">Review items and fill delivery details</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="cartItems.length === 0" class="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm max-w-md mx-auto mt-12 space-y-4">
+      <span class="text-5xl block">🛒</span>
+      <h3 class="text-base font-bold text-pharm-dark">Your Cart is Empty</h3>
+      <p class="text-xs text-gray-400">Add medicines and healthcare products to your cart to checkout.</p>
+      <a routerLink="/" class="inline-block bg-pharm-teal hover:bg-pharm-teal-dark text-white font-bold text-xs px-8 py-3 rounded-lg shadow-md transition-colors uppercase tracking-wider">
+        Shop Medicines
+      </a>
+    </div>
+
+    <!-- Active Cart Layout -->
+    <div *ngIf="cartItems.length > 0" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Left Column: Items & Delivery Form -->
+      <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Cart Items List -->
+        <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-pharm-dark border-b border-gray-50 pb-2">Order Items</h3>
+          
+          <div *ngFor="let item of cartItems" class="flex items-center justify-between gap-4 py-4 border-b border-gray-50 last:border-b-0">
+            <div class="flex gap-4 items-center">
+              <img [src]="item.imageUrl || 'https://via.placeholder.com/150'" 
+                   [alt]="item.name" 
+                   class="w-12 h-12 rounded object-contain bg-pharm-light/20 flex-shrink-0">
+              <div>
+                <h4 class="text-xs font-bold text-pharm-dark line-clamp-1 hover:text-pharm-teal cursor-pointer" 
+                    [routerLink]="['/product', item.productId]">
+                  {{ item.name }}
+                </h4>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-xs font-black text-pharm-dark">₹{{ item.price | number:'1.2-2' }}</span>
+                  <span *ngIf="item.discountPercentage > 0" class="text-[9px] font-bold text-green-600 bg-green-50 px-1 py-0.5 rounded">
+                    {{ item.discountPercentage }}% OFF
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Controllers -->
+            <div class="flex items-center gap-4">
+              <!-- Counter -->
+              <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                <button (click)="decrementQuantity(item)" class="px-2.5 py-1 text-gray-500 hover:bg-pharm-light font-black text-xs transition-colors">
+                  −
+                </button>
+                <span class="px-3 text-xs font-bold text-pharm-dark min-w-[20px] text-center">
+                  {{ item.quantity }}
+                </span>
+                <button (click)="incrementQuantity(item)" class="px-2.5 py-1 text-gray-500 hover:bg-pharm-light font-black text-xs transition-colors">
+                  +
+                </button>
+              </div>
+
+              <!-- Delete Button -->
+              <button (click)="removeItem(item.productId)" class="text-red-500 hover:text-red-700 transition-colors text-xs font-bold">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Delivery Details Form -->
+        <div [formGroup]="checkoutForm" class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm space-y-6">
+          <h3 class="text-sm font-bold text-pharm-dark border-b border-gray-50 pb-2">Delivery Address</h3>
+          
+          <div class="space-y-4">
+            <!-- Patient Name -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-500 block">Patient Name</label>
+              <input formControlName="patientName" 
+                     placeholder="Enter patient full name" 
+                     class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-pharm-teal text-sm text-pharm-dark placeholder-gray-400">
+              <p *ngIf="checkoutForm.get('patientName')?.touched && checkoutForm.get('patientName')?.invalid" class="text-red-500 text-[11px] font-bold">
+                Patient name is required.
+              </p>
+            </div>
+
+            <!-- Delivery Address -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-500 block">Delivery Shipping Address</label>
+              <textarea formControlName="deliveryAddress" 
+                        placeholder="House No, Building, Street, Area" 
+                        rows="3"
+                        class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-pharm-teal text-sm text-pharm-dark placeholder-gray-400 resize-none"></textarea>
+              <p *ngIf="checkoutForm.get('deliveryAddress')?.touched && checkoutForm.get('deliveryAddress')?.invalid" class="text-red-500 text-[11px] font-bold">
+                Delivery address is required (minimum 10 characters).
+              </p>
+            </div>
+
+            <!-- Pincode -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-500 block">Pincode</label>
+              <input formControlName="pincode" 
+                     placeholder="e.g. 400001" 
+                     class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-pharm-teal text-sm text-pharm-dark placeholder-gray-400">
+              <p *ngIf="checkoutForm.get('pincode')?.touched && checkoutForm.get('pincode')?.invalid" class="text-red-500 text-[11px] font-bold">
+                Please enter a valid 6-digit Pincode.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Bill Summary -->
+      <div class="space-y-6">
+        
+        <!-- Invoice summary -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-pharm-dark border-b border-gray-50 pb-2">Bill Summary</h3>
+          
+          <div class="space-y-3.5 text-xs text-gray-500">
+            <div class="flex justify-between">
+              <span>Cart Total (MRP)</span>
+              <span class="font-bold text-pharm-dark">₹{{ mrp | number:'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between" *ngIf="discount > 0">
+              <span>Product Discount</span>
+              <span class="font-bold text-green-600">- ₹{{ discount | number:'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Delivery Charges</span>
+              <span class="font-bold text-pharm-dark">
+                {{ deliveryFee > 0 ? '₹' + (deliveryFee | number:'1.2-2') : 'FREE' }}
+              </span>
+            </div>
+            
+            <div class="flex justify-between pt-3 border-t border-dashed border-gray-100">
+              <span class="text-sm font-bold text-pharm-dark">Amount to be paid</span>
+              <span class="text-lg font-black text-pharm-teal">₹{{ totalAmount | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checkout Action Button -->
+        <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm space-y-3">
+          <button (click)="onSubmit()"
+                  [disabled]="isSubmitting"
+                  class="w-full bg-[#facc15] hover:bg-[#eab308] text-pharm-dark font-black text-sm py-4 rounded-lg shadow-md hover:shadow-lg transition-all uppercase tracking-wider">
+            {{ isSubmitting ? 'Processing Order...' : 'Pay ₹' + (totalAmount | number:'1.0-0') + '.00 & Place Order' }}
+          </button>
+          
+          <p class="text-[10px] text-gray-400 text-center leading-relaxed">
+            By proceeding, you agree to PharmEasy's terms of service and consent to delivery scheduling.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+

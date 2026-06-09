@@ -1,0 +1,64 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-pharm-dark">Lab Tests</h1>
+    <p class="text-gray-500 text-sm mt-1">Book diagnostic tests with home sample collection — powered by certified labs</p>
+  </div>
+
+  <div class="flex gap-2 flex-wrap mb-6">
+    <button (click)="filterCategory('')" [class.bg-pharm-teal]="!selectedCategory" [class.text-white]="!selectedCategory"
+      class="px-4 py-2 rounded-full text-sm font-semibold bg-white border">All</button>
+    @for (cat of categories; track cat) {
+      <button (click)="filterCategory(cat)" [class.bg-pharm-teal]="selectedCategory === cat" [class.text-white]="selectedCategory === cat"
+        class="px-4 py-2 rounded-full text-sm font-semibold bg-white border">{{ cat }}</button>
+    }
+  </div>
+
+  @if (message) { <div class="bg-green-50 text-green-700 px-4 py-3 rounded-lg mb-4">{{ message }}</div> }
+  @if (error) { <div class="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-4">{{ error }}</div> }
+
+  @if (isLoading) {
+    <div class="text-center py-12 text-gray-500">Loading lab tests...</div>
+  } @else {
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (test of tests; track test.id) {
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+          <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded">{{ test.discountPercentage }}% OFF</span>
+          <h3 class="font-bold text-pharm-dark mt-3">{{ test.name }}</h3>
+          <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ test.description }}</p>
+          <div class="mt-4 flex items-baseline gap-2">
+            <span class="text-gray-400 line-through text-sm">₹{{ test.mrp }}</span>
+            <span class="text-xl font-bold text-pharm-teal">₹{{ test.discountedPrice }}</span>
+          </div>
+          <button (click)="openBooking(test)" class="mt-4 w-full bg-pharm-teal hover:bg-pharm-teal-dark text-white py-2 rounded-lg text-sm font-semibold">
+            Book Now
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (showBooking && selectedTest) {
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-xl p-6 max-w-md w-full">
+        <h3 class="font-bold text-lg mb-1">Book: {{ selectedTest.name }}</h3>
+        <p class="text-pharm-teal font-bold mb-4">₹{{ selectedTest.discountedPrice }}</p>
+        <div class="space-y-3">
+          <input [(ngModel)]="booking.patientName" placeholder="Patient name" class="w-full border rounded-lg px-3 py-2 text-sm" />
+          <input [(ngModel)]="booking.address" placeholder="Collection address" class="w-full border rounded-lg px-3 py-2 text-sm" />
+          <input [(ngModel)]="booking.pincode" placeholder="Pincode" class="w-full border rounded-lg px-3 py-2 text-sm" />
+          <input [(ngModel)]="booking.bookingDate" type="date" class="w-full border rounded-lg px-3 py-2 text-sm" />
+          <select [(ngModel)]="booking.timeSlot" class="w-full border rounded-lg px-3 py-2 text-sm">
+            <option>Morning (8 AM - 12 PM)</option>
+            <option>Afternoon (12 PM - 4 PM)</option>
+            <option>Evening (4 PM - 8 PM)</option>
+          </select>
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button (click)="showBooking = false" class="flex-1 border py-2 rounded-lg text-sm">Cancel</button>
+          <button (click)="confirmBooking()" class="flex-1 bg-pharm-teal text-white py-2 rounded-lg text-sm font-semibold">Confirm Booking</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
