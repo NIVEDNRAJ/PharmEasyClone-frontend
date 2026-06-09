@@ -4,9 +4,9 @@ agent any
  
 environment {
  
-IMAGE = "PharmEasy-frontend:${BUILD_NUMBER}"
+IMAGE = "pharmeasy-frontend:${BUILD_NUMBER}"
  
-CONT = "PharmEasy-frontend"
+CONT = "pharmeasy-frontend"
  
 }
  
